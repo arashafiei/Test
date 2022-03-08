@@ -1,20 +1,16 @@
 {
-  "name": "pod-communication-offline-js-sdk",
+  "name": "pod-com-offline-sdk",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/arashafiei/test.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/arashafiei/test/issues"
-  },
-  "homepage": "https://github.com/arashafiei/test#readme"
+  "dependencies": {
+    "@lottiefiles/lottie-player": "^1.5.6",
+    "jquery": "^3.6.0"
+  }
 }

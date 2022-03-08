@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/player.iml" filepath="$PROJECT_DIR$/.idea/player.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/pod-com-offline-sdk.iml" filepath="$PROJECT_DIR$/.idea/pod-com-offline-sdk.iml" />
     </modules>
   </component>
 </project>
