@@ -31,7 +31,6 @@
             if (this.video.preload === "none" || this.video.getAttribute("preload") === null) {
                 this.video.preload = "metadata";
             }
-
             // create wrappers and controls
             this.controls = {};
             this.timer = {};

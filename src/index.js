@@ -1,5 +1,4 @@
 'use strict';
-
 (function () {
     let jquery
         , playaController
@@ -11,13 +10,17 @@
             playaController = require("./js/controller");
             require("@lottiefiles/lottie-player");
             loadingJSON = require("../loading.json");
+            require("./css/style.css");
+            require("./css/player.css");
         } else {
-            jquery = window.jQuery
-            playaController = window.Playa
+            jquery = window.jQuery;
+            playaController = window.Playa;
+
         }
 
         const
-            afterBufferSecond = 20
+            selfInstance = this
+            , afterBufferSecond = 20
             , beforeBufferSecond = 10
             , parser = new DOMParser()
             , maxRequestNumber = 10
@@ -84,17 +87,20 @@
                 domElements.container.setAttribute('class', "stream-video-container");
                 domElements.container.setAttribute('id', "stream-video-container");
 
-                domElements.video = document.createElement("video")
+                domElements.video = document.createElement("video")//document.querySelector("#myVideoTag") //= document.createElement("video")
+                domElements.video.setAttribute('playsinline', '');
                 domElements.video.setAttribute('id', "stream-video-tag");
                 domElements.video.setAttribute('class', "stream-video-tag");
-                domElements.video.setAttribute('poster', './img/poster.png');
+                domElements.video.setAttribute('autoplay', "");
+                domElements.video.setAttribute('time', "0");
+                domElements.video.setAttribute('preload', "auto");
+                // domElements.video.setAttribute('poster', './img/poster.png');
 
                 domElements.loader = document.createElement("lottie-player");
                 domElements.loader.setAttribute('class', "stream-loading lottie-loading hidden");
                 domElements.loader.setAttribute('id', "stream-loading");
                 domElements.loader.setAttribute('background', "transparent");
                 domElements.loader.setAttribute('speed', "1");
-                domElements.loader.setAttribute('autoplay', "");
                 domElements.loader.setAttribute('loop', "");
 
                 domElements.loader.setAttribute('src', loadingJSON);
@@ -104,8 +110,7 @@
                 const parentElement = document.getElementById(containerId);
                 parentElement.appendChild(domElements.container);
 
-                playaVideo = new playaController(domElements.video)
-
+                playaVideo = new window.Playa(domElements.video);
         }
 
         function setLoading(showLoading) {
@@ -224,7 +229,13 @@
                     if (!registerAgain) {
                         initManifestData(response.manifest + "")
                         initSourceBuffer();
-                        domElements.video.play();
+
+
+                        domElements.video.play().catch(error => {
+                            console.log(error)
+                        });
+
+
                     } else {
                         logging.info && console.info("SEEKING IN REGISTER")
                         seekToSegment(segment);
@@ -346,7 +357,7 @@
                 0) + 1;
         }
 
-        function logBuffered() {
+        this.logBuffered = function () {
             try {
                 let ranges = sourceBuffer.buffered;
                 logging.debug && console.debug("BUFFERED RANGES: " + ranges.length);
@@ -392,7 +403,7 @@
                             if (!sourceBuffer.updating) {
                                 sourceBuffer.appendBuffer(response);
                                 setTimeout(function () {
-                                    logBuffered();
+                                    selfInstance.logBuffered();
                                 }, 200)
                                 clearInterval(appendIntVal);
                             }
@@ -573,7 +584,6 @@
         function initSourceBuffer() {
             sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
             logging.info && console.info("MediaSource support mimeCodec: " + MediaSource.isTypeSupported(mimeCodec));
-
             sourceBuffer.addEventListener("error", function (ev) {
                 logging.error && console.error("error to update buffer:" + ev);
             });

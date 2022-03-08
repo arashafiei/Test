@@ -83,10 +83,9 @@ article {
 
 .responsive-video .controls-bottom-tray {
     align-items: center;
-/ / background: rgba(0, 0, 0, .5);
-    background-image: linear-gradient(to top, rgba(0, 0, 0, .5), rgba(0, 0, 0, 0));
-/ / background-image: linear-gradient(to top, rgba(133, 154, 160, .7), rgba(133, 154, 160, 0));
-/ / box-shadow: 0 px - 1 px 5 px rgba(255, 255, 255, .25);
+ background: rgba(0, 0, 0, .5);
+    background-image: linear-gradient(to top, rgba(0, 0, 0, .5), rgba(0, 0, 0, 0));background-image: linear-gradient(to top, rgba(133, 154, 160, .7), rgba(133, 154, 160, 0));
+    box-shadow: 0 px - 1 px 5 px rgba(255, 255, 255, .25);
     bottom: 0;
     color: #fff;
     cursor: default;
@@ -153,7 +152,7 @@ div.controls-wrapper:not(.disable):hover .play-button {
 }
 
 .controls-bottom-tray .track-inner {
-/ / background: rgba(255, 255, 255, .5);
+    background: rgba(255, 255, 255, .5);
     background: rgba(133, 154, 160, .5);
     border-radius: .0625em;
 
