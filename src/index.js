@@ -1,12 +1,15 @@
 'use strict';
 
 (function () {
-    let jquery;
+    let jquery
+        , loading;
 
     function OfflinePlayerSDK(params) {
         if (typeof (require) !== 'undefined' && typeof (exports) !== 'undefined') {
             jquery = require("jquery");
             require("@lottiefiles/lottie-player");
+            loading = require("../loading.json");
+            console.log(loading)
         } else {
             jquery = window.jQuery
         }
