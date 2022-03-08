@@ -1,16 +1,3 @@
-/*
-features
-	closed captions
-
-- style
-	LINK logo
-	#f46453
-	#2abff4
-	#859aa0
-*/
-
-
-
 (function() {
     const prefix = ['','moz', 'webkit', 'ms'].find((p) => !p ? ('fullscreenElement' in document) : (p + 'FullScreenElement' in document));
 
