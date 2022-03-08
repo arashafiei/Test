@@ -2,16 +2,18 @@
 
 (function () {
     let jquery
-        , loading;
+        , playaController
+        , loadingJSON;
 
     function OfflinePlayerSDK(params) {
         if (typeof (require) !== 'undefined' && typeof (exports) !== 'undefined') {
             jquery = require("jquery");
+            playaController = require("./js/controller");
             require("@lottiefiles/lottie-player");
-            loading = require("../loading.json");
-            console.log(loading)
+            loadingJSON = require("../loading.json");
         } else {
             jquery = window.jQuery
+            playaController = window.Playa
         }
 
         const
@@ -77,7 +79,7 @@
         };
 
         function init() {
-            jquery.getScript("./js/controller.js", function (){
+
                 domElements.container = document.createElement("div");
                 domElements.container.setAttribute('class', "stream-video-container");
                 domElements.container.setAttribute('id', "stream-video-container");
@@ -95,18 +97,15 @@
                 domElements.loader.setAttribute('autoplay', "");
                 domElements.loader.setAttribute('loop', "");
 
-                jquery.getJSON("./loading.json", function (json) {
-                    domElements.loader.setAttribute('src', json);
+                domElements.loader.setAttribute('src', loadingJSON);
 
-                    domElements.container.appendChild(domElements.loader);
-                    domElements.container.appendChild(domElements.video);
-                    const parentElement = document.getElementById(containerId);
-                    parentElement.appendChild(domElements.container);
-                });
+                domElements.container.appendChild(domElements.loader);
+                domElements.container.appendChild(domElements.video);
+                const parentElement = document.getElementById(containerId);
+                parentElement.appendChild(domElements.container);
 
+                playaVideo = new playaController(domElements.video)
 
-                playaVideo = new playa(domElements.video)
-            })
         }
 
         function setLoading(showLoading) {
