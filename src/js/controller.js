@@ -99,6 +99,7 @@
             this.video.setAttribute("tabindex", 0);
 
             this.video.addEventListener("loadeddata", (evt) => {
+
                 const ratio = (this.video.videoHeight / this.video.videoWidth);
                 this.wrapper.classList.add("loaded");
                 this.wrapper.style.paddingTop = (ratio * 100) + "%";

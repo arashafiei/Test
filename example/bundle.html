@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Media Player</title>
+    <script type="text/javascript" src="../dist/pod-com-offline-sdk-3.4.0.js"></script>
+  </head>
+
+  <body>
+  <button id="bbbb">Load Video</button>
+  <button id="cccc">Stop Video</button>
+
+  <div id="aaa">
+  </div>
+
+  <script>
+    var SDK = new window.POD.OFFLINEPLAYERSDK({
+      containerId: "aaa",
+      env: "main",
+      logging: {
+        info: false,
+        debug: false,
+        error: true
+      },
+      styling: {
+        container: {
+          width: 300,
+          height: 300
+        }
+      }
+    });
+
+
+    document.getElementById("bbbb").addEventListener("click", function (evt) {
+      evt.preventDefault();
+      SDK.playMedia({
+        hash: "DBPPGRD3PUPV4MNL",
+        quality: 240,
+        token: "ed24e37c7ee84313acf2805a80122f94",
+      });
+    });
+    document.getElementById("cccc").addEventListener("click", function (evt) {
+      evt.preventDefault();
+      SDK.destroyVideo()
+    });
+  </script>
+  </body>
+</html>

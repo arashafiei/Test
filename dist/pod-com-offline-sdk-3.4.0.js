@@ -11050,7 +11050,6 @@ var css = "* {\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box
 var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border: 1px solid #000;\n  background-color: #000;\n}\n#info input[type=text] {\n  width: 300px;\n}\nh4 {\n  margin: 2px;\n}\n.button {\n  display: inline-block;\n  border-radius: 4px;\n  background-color: #f4511e;\n  border: none;\n  color: #FFFFFF;\n  text-align: center;\n  font-size: 21px;\n  padding: 5px;\n  width: 100px;\n  transition: all 0.5s;\n  cursor: pointer;\n  margin: 5px;\n}\n.button span {\n  cursor: pointer;\n  display: inline-block;\n  position: relative;\n  transition: 0.5s;\n}\n.button span:after {\n  content: '\\00bb';\n  position: absolute;\n  opacity: 0;\n  top: 0;\n  right: -20px;\n  transition: 0.5s;\n}\n.button:hover span {\n  padding-right: 25px;\n}\n.button:hover span:after {\n  opacity: 1;\n  right: 0;\n}\n/* thumbnail box */\n.title {\n  color: #1a1a1a;\n  text-align: center;\n  margin-bottom: 10px;\n}\n.content {\n  position: relative;\n  width: 90%;\n  max-width: 400px;\n  margin: auto;\n  overflow: hidden;\n  -webkit-box-shadow: 0px 1px 21px 2px rgba(109, 49, 10, 0.71);\n  box-shadow: 0px 1px 21px 2px rgba(109, 49, 10, 0.71);\n}\n.content .content-overlay {\n  background: rgba(0, 0, 0, 0.7);\n  position: absolute;\n  height: 100%;\n  width: 100%;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  opacity: 0;\n  -webkit-transition: all 0.4s ease-in-out 0s;\n  -moz-transition: all 0.4s ease-in-out 0s;\n  transition: all 0.4s ease-in-out 0s;\n}\n.content:hover .content-overlay {\n  opacity: 1;\n}\n.content-image {\n  width: 100%;\n}\nimg {\n  box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.1);\n  border-radius: 5px;\n}\n.content-details {\n  position: absolute;\n  text-align: center;\n  padding-left: 1em;\n  padding-right: 1em;\n  width: 100%;\n  top: 50%;\n  left: 50%;\n  opacity: 0;\n  -webkit-transform: translate(-50%, -50%);\n  -moz-transform: translate(-50%, -50%);\n  transform: translate(-50%, -50%);\n  -webkit-transition: all 0.3s ease-in-out 0s;\n  -moz-transition: all 0.3s ease-in-out 0s;\n  transition: all 0.3s ease-in-out 0s;\n}\n.content:hover .content-details {\n  top: 50%;\n  left: 50%;\n  opacity: 1;\n}\n.content-details h3 {\n  color: #fff;\n  font-weight: 500;\n  letter-spacing: 0.15em;\n  margin-bottom: 0.5em;\n  text-transform: uppercase;\n}\n.content-details p {\n  color: #fff;\n  font-size: 0.8em;\n}\n.fadeIn-bottom {\n  top: 80%;\n}\n/* loading */\n*.hidden {\n  display: none !important;\n}\n.lottie-loading {\n  margin: auto;\n  position: absolute;\n  top: 0;\n  left: 0;\n  bottom: 0;\n  right: 0;\n  width: 80px;\n  height: 80px;\n  background-color: #fff;\n  border-radius: 50%;\n  box-shadow: 0 0 18px #00000060;\n  z-index: 999;\n}\n.player-container {\n  position: relative;\n}\nvideo::-webkit-media-controls {\n  visibility: hidden;\n}\nvideo::-webkit-media-controls-enclosure {\n  visibility: visible;\n}\n"; (require("browserify-css").createStyle(css, { "href": "src\\css\\style.css" }, { "insertAt": "bottom" })); module.exports = css;
 },{"browserify-css":4}],8:[function(require,module,exports){
 'use strict';
-
 (function () {
     let jquery
         , playaController
@@ -11059,26 +11058,35 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
     function OfflinePlayerSDK(params) {
         if (typeof (require) !== 'undefined' && typeof (exports) !== 'undefined') {
             jquery = require("jquery");
-            playaController = require("./js/controller");
+            require("./js/controller.js");
             require("@lottiefiles/lottie-player");
             loadingJSON = require("../loading.json");
             require("./css/style.css");
             require("./css/player.css");
         } else {
-            jquery = window.jQuery
-            playaController = window.Playa
+            jquery = window.jQuery;
         }
 
+        playaController = window.Playa;
+
         const
-            afterBufferSecond = 20
+            selfInstance = this
+            , afterBufferSecond = 20
             , beforeBufferSecond = 10
             , parser = new DOMParser()
             , maxRequestNumber = 10
             , logging = {
-                error: params.logging.error || false,
-                warning: params.logging.warning || false,
-                debug: params.logging.debug || false,
-                info: params.logging.info || false
+                error:  false,
+                warning: false,
+                debug:  false,
+                info: false
+            }
+
+            if(params.logging) {
+                logging.error = !!params.logging.error;
+                logging.warning = !!params.logging.warning;
+                logging.debug = !!params.logging.debug;
+                logging.info = !!params.logging.info;
             }
 
         let
@@ -11123,41 +11131,61 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
             hash = params.hash;
             token = params.token;
             quality = params.quality;
+            createElements();
+            const parentElement = document.getElementById(containerId);
+            parentElement.appendChild(domElements.container);
+            playaVideo = new playaController(domElements.video);
+            domElements.video = document.getElementById("stream-video-tag")
             resetParameters();
-            startPlayingVideo(true);
+            setTimeout(function (){
+                startPlayingVideo(true);
+            })
         };
 
         this.setToken = function (newToken) {
             token = newToken
         };
 
+        this.destroyVideo = function () {
+            abortRecentRequests();
+            resetParameters();
+            domElements = {};
+            document.getElementById("stream-video-container").remove()
+        }
+
         function init() {
+            createElements();
+        }
 
-                domElements.container = document.createElement("div");
-                domElements.container.setAttribute('class', "stream-video-container");
-                domElements.container.setAttribute('id', "stream-video-container");
+        function createElements() {
+            if(!document.getElementById("pod-comm-offline-sdk-materialicons"))
+                jquery("head").prepend("<link id='pod-comm-offline-sdk-materialicons' href=\"https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css\"    rel=\"stylesheet\">")
 
-                domElements.video = document.createElement("video")
-                domElements.video.setAttribute('id', "stream-video-tag");
-                domElements.video.setAttribute('class', "stream-video-tag");
-                domElements.video.setAttribute('poster', './img/poster.png');
+            domElements.container = document.createElement("div");
+            domElements.container.setAttribute('class', "stream-video-container");
+            domElements.container.setAttribute('id', "stream-video-container");
+            domElements.container.style.position = "relative";
 
-                domElements.loader = document.createElement("lottie-player");
-                domElements.loader.setAttribute('class', "stream-loading lottie-loading hidden");
-                domElements.loader.setAttribute('id', "stream-loading");
-                domElements.loader.setAttribute('background', "transparent");
-                domElements.loader.setAttribute('speed', "1");
-                domElements.loader.setAttribute('autoplay', "");
-                domElements.loader.setAttribute('loop', "");
+            domElements.video = document.createElement("video")//document.querySelector("#myVideoTag") //= document.createElement("video")
+            domElements.video.setAttribute('playsinline', '');
+            domElements.video.setAttribute('id', "stream-video-tag");
+            domElements.video.setAttribute('class', "stream-video-tag");
+            // domElements.video.setAttribute('autoplay', "");
+            domElements.video.setAttribute('time', "0");
+            domElements.video.setAttribute('preload', "auto");
 
-                domElements.loader.setAttribute('src', loadingJSON);
+            domElements.loader = document.createElement("lottie-player");
+            domElements.loader.setAttribute('class', "stream-loading lottie-loading hidden");
+            domElements.loader.setAttribute('id', "stream-loading");
+            domElements.loader.setAttribute('background', "transparent");
+            domElements.loader.setAttribute('speed', "1");
+            domElements.loader.setAttribute('loop', "");
+            domElements.loader.setAttribute('autoplay', "");
 
-                domElements.container.appendChild(domElements.loader);
-                domElements.container.appendChild(domElements.video);
-                const parentElement = document.getElementById(containerId);
-                parentElement.appendChild(domElements.container);
+            domElements.loader.setAttribute('src', JSON.stringify(loadingJSON));
 
-                playaVideo = new window.Playa(domElements.video);
+            domElements.container.appendChild(domElements.loader);
+            domElements.container.appendChild(domElements.video);
         }
 
         function setLoading(showLoading) {
@@ -11276,7 +11304,13 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
                     if (!registerAgain) {
                         initManifestData(response.manifest + "")
                         initSourceBuffer();
-                        domElements.video.play();
+
+
+                        domElements.video.play().catch(error => {
+                            console.log(error)
+                        });
+
+
                     } else {
                         logging.info && console.info("SEEKING IN REGISTER")
                         seekToSegment(segment);
@@ -11398,7 +11432,7 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
                 0) + 1;
         }
 
-        function logBuffered() {
+        this.logBuffered = function () {
             try {
                 let ranges = sourceBuffer.buffered;
                 logging.debug && console.debug("BUFFERED RANGES: " + ranges.length);
@@ -11444,7 +11478,7 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
                             if (!sourceBuffer.updating) {
                                 sourceBuffer.appendBuffer(response);
                                 setTimeout(function () {
-                                    logBuffered();
+                                    selfInstance.logBuffered();
                                 }, 200)
                                 clearInterval(appendIntVal);
                             }
@@ -11625,7 +11659,6 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
         function initSourceBuffer() {
             sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
             logging.info && console.info("MediaSource support mimeCodec: " + MediaSource.isTypeSupported(mimeCodec));
-
             sourceBuffer.addEventListener("error", function (ev) {
                 logging.error && console.error("error to update buffer:" + ev);
             });
@@ -11664,7 +11697,7 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
 
 })();
 
-},{"../loading.json":2,"./css/player.css":6,"./css/style.css":7,"./js/controller":9,"@lottiefiles/lottie-player":3,"jquery":5}],9:[function(require,module,exports){
+},{"../loading.json":2,"./css/player.css":6,"./css/style.css":7,"./js/controller.js":9,"@lottiefiles/lottie-player":3,"jquery":5}],9:[function(require,module,exports){
 (function() {
     const prefix = ['','moz', 'webkit', 'ms'].find((p) => !p ? ('fullscreenElement' in document) : (p + 'FullScreenElement' in document));
 
@@ -11698,7 +11731,6 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
             if (this.video.preload === "none" || this.video.getAttribute("preload") === null) {
                 this.video.preload = "metadata";
             }
-
             // create wrappers and controls
             this.controls = {};
             this.timer = {};
@@ -11767,6 +11799,7 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
             this.video.setAttribute("tabindex", 0);
 
             this.video.addEventListener("loadeddata", (evt) => {
+
                 const ratio = (this.video.videoHeight / this.video.videoWidth);
                 this.wrapper.classList.add("loaded");
                 this.wrapper.style.paddingTop = (ratio * 100) + "%";
@@ -12009,4 +12042,5 @@ var css = "body,\n#footer {\n  background-color: #eaeaea;\n}\nvideo {\n  border:
 
     window.Playa = Playa;
 })();
+
 },{}]},{},[1]);

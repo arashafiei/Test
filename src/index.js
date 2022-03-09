@@ -7,16 +7,16 @@
     function OfflinePlayerSDK(params) {
         if (typeof (require) !== 'undefined' && typeof (exports) !== 'undefined') {
             jquery = require("jquery");
-            playaController = require("./js/controller");
+            require("./js/controller.js");
             require("@lottiefiles/lottie-player");
             loadingJSON = require("../loading.json");
             require("./css/style.css");
             require("./css/player.css");
         } else {
             jquery = window.jQuery;
-            playaController = window.Playa;
-
         }
+
+        playaController = window.Playa;
 
         const
             selfInstance = this
@@ -25,10 +25,17 @@
             , parser = new DOMParser()
             , maxRequestNumber = 10
             , logging = {
-                error: params.logging.error || false,
-                warning: params.logging.warning || false,
-                debug: params.logging.debug || false,
-                info: params.logging.info || false
+                error:  false,
+                warning: false,
+                debug:  false,
+                info: false
+            }
+
+            if(params.logging) {
+                logging.error = !!params.logging.error;
+                logging.warning = !!params.logging.warning;
+                logging.debug = !!params.logging.debug;
+                logging.info = !!params.logging.info;
             }
 
         let
@@ -73,44 +80,61 @@
             hash = params.hash;
             token = params.token;
             quality = params.quality;
+            createElements();
+            const parentElement = document.getElementById(containerId);
+            parentElement.appendChild(domElements.container);
+            playaVideo = new playaController(domElements.video);
+            domElements.video = document.getElementById("stream-video-tag")
             resetParameters();
-            startPlayingVideo(true);
+            setTimeout(function (){
+                startPlayingVideo(true);
+            })
         };
 
         this.setToken = function (newToken) {
             token = newToken
         };
 
+        this.destroyVideo = function () {
+            abortRecentRequests();
+            resetParameters();
+            domElements = {};
+            document.getElementById("stream-video-container").remove()
+        }
+
         function init() {
+            createElements();
+        }
 
-                domElements.container = document.createElement("div");
-                domElements.container.setAttribute('class', "stream-video-container");
-                domElements.container.setAttribute('id', "stream-video-container");
+        function createElements() {
+            if(!document.getElementById("pod-comm-offline-sdk-materialicons"))
+                jquery("head").prepend("<link id='pod-comm-offline-sdk-materialicons' href=\"https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css\"    rel=\"stylesheet\">")
 
-                domElements.video = document.createElement("video")//document.querySelector("#myVideoTag") //= document.createElement("video")
-                domElements.video.setAttribute('playsinline', '');
-                domElements.video.setAttribute('id', "stream-video-tag");
-                domElements.video.setAttribute('class', "stream-video-tag");
-                domElements.video.setAttribute('autoplay', "");
-                domElements.video.setAttribute('time', "0");
-                domElements.video.setAttribute('preload', "auto");
-                // domElements.video.setAttribute('poster', './img/poster.png');
+            domElements.container = document.createElement("div");
+            domElements.container.setAttribute('class', "stream-video-container");
+            domElements.container.setAttribute('id', "stream-video-container");
+            domElements.container.style.position = "relative";
 
-                domElements.loader = document.createElement("lottie-player");
-                domElements.loader.setAttribute('class', "stream-loading lottie-loading hidden");
-                domElements.loader.setAttribute('id', "stream-loading");
-                domElements.loader.setAttribute('background', "transparent");
-                domElements.loader.setAttribute('speed', "1");
-                domElements.loader.setAttribute('loop', "");
+            domElements.video = document.createElement("video")//document.querySelector("#myVideoTag") //= document.createElement("video")
+            domElements.video.setAttribute('playsinline', '');
+            domElements.video.setAttribute('id', "stream-video-tag");
+            domElements.video.setAttribute('class', "stream-video-tag");
+            // domElements.video.setAttribute('autoplay', "");
+            domElements.video.setAttribute('time', "0");
+            domElements.video.setAttribute('preload', "auto");
 
-                domElements.loader.setAttribute('src', loadingJSON);
+            domElements.loader = document.createElement("lottie-player");
+            domElements.loader.setAttribute('class', "stream-loading lottie-loading hidden");
+            domElements.loader.setAttribute('id', "stream-loading");
+            domElements.loader.setAttribute('background', "transparent");
+            domElements.loader.setAttribute('speed', "1");
+            domElements.loader.setAttribute('loop', "");
+            domElements.loader.setAttribute('autoplay', "");
 
-                domElements.container.appendChild(domElements.loader);
-                domElements.container.appendChild(domElements.video);
-                const parentElement = document.getElementById(containerId);
-                parentElement.appendChild(domElements.container);
+            domElements.loader.setAttribute('src', JSON.stringify(loadingJSON));
 
-                playaVideo = new window.Playa(domElements.video);
+            domElements.container.appendChild(domElements.loader);
+            domElements.container.appendChild(domElements.video);
         }
 
         function setLoading(showLoading) {
