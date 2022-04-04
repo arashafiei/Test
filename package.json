@@ -4,8 +4,10 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "bundle": "browserify -t browserify-css browser-bundling.js -o ./dist/pod-com-offline-sdk-3.4.0.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "bundle": "browserify -t browserify-css browser-bundling.js -o ./dist/pod-com-offline.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish:release": "npm run version:release && npm publish",
+    "version:release": "npm version 3.5.0"
   },
   "keywords": [],
   "author": "",

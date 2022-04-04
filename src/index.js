@@ -141,7 +141,8 @@
             if (showLoading) {
                 domElements.loader.classList.remove("hidden");
             } else {
-                domElements.loader.classList.add("hidden");
+                if(domElements.loader)
+                    domElements.loader.classList.add("hidden");
             }
         }
 
@@ -640,6 +641,9 @@
         }
 
         init();
+    }
+    if(typeof module !== "undefined") {
+        module.exports = OfflinePlayerSDK
     }
     window.POD = {};
     window.POD.OFFLINEPLAYERSDK = OfflinePlayerSDK;

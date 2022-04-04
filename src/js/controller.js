@@ -339,6 +339,8 @@
         }
 
     }
-
+    if(typeof module !== 'undefined') {
+        module.exports = Playa;
+    }
     window.Playa = Playa;
 })();
