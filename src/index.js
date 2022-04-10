@@ -25,18 +25,18 @@
             , parser = new DOMParser()
             , maxRequestNumber = 10
             , logging = {
-                error:  false,
+                error: false,
                 warning: false,
-                debug:  false,
+                debug: false,
                 info: false
             }
 
-            if(params.logging) {
-                logging.error = !!params.logging.error;
-                logging.warning = !!params.logging.warning;
-                logging.debug = !!params.logging.debug;
-                logging.info = !!params.logging.info;
-            }
+        if (params.logging) {
+            logging.error = !!params.logging.error;
+            logging.warning = !!params.logging.warning;
+            logging.debug = !!params.logging.debug;
+            logging.info = !!params.logging.info;
+        }
 
         let
             requestsList = []
@@ -46,12 +46,14 @@
             , segmentDuration = 0
             , consumeLink = ''
             , produceLink = ''
+            , refreshLink = ''
             , currentSegment = -1
             , pause = false
             , sourceBuffer
             , fetchingIntervalStart = null
             , currentRequestNumber = 0
             , seekingSetTimeout = null
+            , refreshInterval = null
 
             , environment = params.env || 'main'
             , communicationServers = {
@@ -86,7 +88,7 @@
             playaVideo = new playaController(domElements.video);
             domElements.video = document.getElementById("stream-video-tag")
             resetParameters();
-            setTimeout(function (){
+            setTimeout(function () {
                 startPlayingVideo(true);
             })
         };
@@ -107,7 +109,7 @@
         }
 
         function createElements() {
-            if(!document.getElementById("pod-comm-offline-sdk-materialicons"))
+            if (!document.getElementById("pod-comm-offline-sdk-materialicons"))
                 jquery("head").prepend("<link id='pod-comm-offline-sdk-materialicons' href=\"https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css\"    rel=\"stylesheet\">")
 
             domElements.container = document.createElement("div");
@@ -141,7 +143,7 @@
             if (showLoading) {
                 domElements.loader.classList.remove("hidden");
             } else {
-                if(domElements.loader)
+                if (domElements.loader)
                     domElements.loader.classList.add("hidden");
             }
         }
@@ -152,6 +154,7 @@
             segmentDuration = 0;
             consumeLink = "";
             produceLink = "";
+            refreshLink = "";
             currentSegment = -1;
             pause = false;
             if (fetchingIntervalStart != null) {
@@ -161,6 +164,10 @@
             if (seekingSetTimeout != null) {
                 clearTimeout(seekingSetTimeout);
                 seekingSetTimeout = null;
+            }
+            if (refreshInterval != null) {
+                clearTimeout(refreshInterval);
+                refreshInterval = null;
             }
         }
 
@@ -243,8 +250,10 @@
 
                     consumeLink = response.consumLink;
                     produceLink = response.produceLink;
+                    refreshLink = response.refreshLink;
                     logging.info && console.info("consumeLink:" + response.consumLink);
                     logging.info && console.info("produceLink: " + response.produceLink);
+                    logging.info && console.info("refreshLink: " + response.refreshLink);
                     logging.info && console.info(
                         "total-segment-count:" + totalSegmentCount,
                         "segment-duration-seconds: " + segmentDuration,
@@ -536,6 +545,32 @@
                     }
                 }, 500);
             }
+            if (refreshInterval == null) {
+                refreshInterval = setInterval(() => {
+                    if (refreshLink.length > 0) {
+                        refreshStream()
+                    }
+                }, 1000 * 60 * 5);
+            }
+        }
+
+        function refreshStream() {
+            jquery.ajax(refreshLink, {
+                headers: {
+                    _token_: token,
+                },
+                method: "GET",
+                cache: false,
+                accepts: {
+                    json: "application/json",
+                },
+                success: function (response) {
+                    logging.info && console.info("refresh done");
+                },
+                error: function (jqXhr, textStatus, errorMessage) {
+                    logging.error && console.error(errorMessage);
+                },
+            });
         }
 
         function changeHashFile(hashFile, token, quality) {
@@ -642,7 +677,8 @@
 
         init();
     }
-    if(typeof module !== "undefined") {
+
+    if (typeof module !== "undefined") {
         module.exports = OfflinePlayerSDK
     }
     window.POD = {};
